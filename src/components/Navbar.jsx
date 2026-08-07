@@ -1,9 +1,16 @@
+import { useSelector } from "react-redux";
+
 const Navbar = () => {
+  const user = useSelector((store) => store.user);
   return (
     <div className="navbar bg-base-300 shadow-sm">
       {/* Logo */}
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">DEVTINDER</a>
+      </div>
+
+      <div>
+        <p>welcome back {user?.firstname}</p>
       </div>
 
       {/* Profile dropdown */}
