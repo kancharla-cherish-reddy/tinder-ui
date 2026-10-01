@@ -1,62 +1,98 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { adduser } from "../utils/userslice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 const Login = () => {
-  const [password, setpassword] = useState("Cherish21@");
-  const [emailid, setemailid] = useState("cherish@gmail.com");
+  const [password, setpassword] = useState("");
+  const [emailid, setemailid] = useState("");
+  const [firstname, setfirstname] = useState("");
+  const [lastname, setlastname] = useState("");
+  const [gender, setgender] = useState("");
+  const [signup, setsignup] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handlelogin = async () => {
+  const [error, seterror] = useState("");
+  const [submitting, setsubmitting] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    seterror("");
+    setsubmitting(true);
+
     try {
-      const logindata = await axios.post(
-        "http://localhost:3000/login",
-        { emailid, password },
-        { withCredentials: true }
+      const { data } = await api.post(
+        signup ? "/signup" : "/login",
+        signup
+          ? { firstname, lastname, emailid, password, gender }
+          : { emailid, password }
       );
-      console.log(logindata.data);
-      dispatch(adduser(logindata.data));
-      navigate("/");
-    } catch (err) {
-      console.log(err);
+      dispatch(adduser(data));
+      navigate(signup ? "/profile" : "/", { replace: true });
+    } catch (requestError) {
+      seterror(
+        requestError.response?.data?.message ||
+          "We couldn’t complete that request. Please try again."
+      );
+    } finally {
+      setsubmitting(false);
     }
   };
+
   return (
-    <div className="h-full flex items-center justify-center py-30">
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 ">
-        {/* <legend className="fieldset-legend font-bold text-3xl items-center px-15">
-          Login Page
-        </legend> */}
-        <h1 className="text-3xl font-bold m-auto">Login Page</h1>
+    <div className="auth-page">
+      <section className="auth-story">
+        <p className="eyebrow">Build your developer circle</p>
+        <h1>Meet your next <em>great</em> collaborator.</h1>
+        <p>Find developers who share your interests, trade ideas, and build something worth being proud of.</p>
+        <div className="auth-note">
+          <span className="auth-note-mark" aria-hidden="true">&lt;/&gt;</span>
+          <span><strong>Good work starts with good people.</strong>Make room for your next connection.</span>
+        </div>
+      </section>
 
-        <label className="label">Email</label>
-        <input
-          type="email"
-          className="input"
-          placeholder="Email"
-          value={emailid}
-          onChange={(e) => {
-            setemailid(e.target.value);
-          }}
-        />
-
-        <label className="label">Password</label>
-        <input
-          type="password"
-          className="input"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => {
-            setpassword(e.target.value);
-          }}
-        />
-
-        <button className="btn btn-neutral mt-4" onClick={handlelogin}>
-          Login
+      <section className="auth-card" aria-labelledby="auth-title">
+        <h2 id="auth-title">{signup ? "Create your account" : "Welcome back"}</h2>
+        <p className="auth-caption">{signup ? "A few details to get your developer profile started." : "Sign in to pick up where you left off."}</p>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          {signup && <>
+            <div className="form-field">
+              <label htmlFor="firstname">First name</label>
+              <input id="firstname" type="text" autoComplete="given-name" required maxLength={50} value={firstname} onChange={(e) => setfirstname(e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label htmlFor="lastname">Last name</label>
+              <input id="lastname" type="text" autoComplete="family-name" required maxLength={50} value={lastname} onChange={(e) => setlastname(e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label htmlFor="gender">Gender</label>
+              <select id="gender" required value={gender} onChange={(e) => setgender(e.target.value)}>
+                <option value="" disabled>Select an option</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Other</option>
+              </select>
+            </div>
+          </>}
+          <div className="form-field">
+            <label htmlFor="emailid">Email address</label>
+            <input id="emailid" type="email" autoComplete="email" placeholder="you@example.com" required value={emailid} onChange={(e) => setemailid(e.target.value)} />
+          </div>
+          <div className="form-field">
+            <label htmlFor="password">Password</label>
+            <input id="password" type="password" autoComplete={signup ? "new-password" : "current-password"} placeholder="Enter your password" required minLength={8} value={password} onChange={(e) => setpassword(e.target.value)} />
+          </div>
+          {signup && <p className="form-hint">Use at least 8 characters with uppercase, lowercase, a number, and a symbol.</p>}
+          {error && <p role="alert" className="error-message">{error}</p>}
+          <button className="button button-primary button-wide" type="submit" disabled={submitting}>
+            {submitting ? "Please wait…" : signup ? "Create account" : "Sign in"}
+          </button>
+        </form>
+        <button type="button" className="auth-switch" onClick={() => { setsignup(!signup); seterror(""); }}>
+          {signup ? "Already have an account? Sign in" : "New to DevTinder? Create an account"}
         </button>
-      </fieldset>
+      </section>
     </div>
   );
 };
