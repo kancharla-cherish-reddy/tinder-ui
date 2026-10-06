@@ -25,7 +25,7 @@ npm run dev
 
 Vite normally starts at `http://localhost:5173`. If it reports another port, an earlier process is already using the default port. Stop the old Vite process from the terminal that started it, then restart Vite if you want the app on `5173`.
 
-In development, API requests use the `/api` path and Vite proxies them to `http://localhost:3000`. The proxy removes `/api` before forwarding the request. For a deployed UI, set `VITE_API_URL` to the API's base URL.
+In development, API requests use the `/api` path and Vite proxies them to `http://localhost:3000`. The proxy removes `/api` before forwarding the request. For a deployed UI, set `VITE_API_URL` to the API's base URL. The local `.env` contains only this public API URL; it is ignored by Git. Never put a database URI, JWT secret, password, or other private value in the UI project or a `VITE_*` variable, because Vite exposes those values in browser code.
 
 ## Main screens
 

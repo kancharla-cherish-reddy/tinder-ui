@@ -42,6 +42,8 @@ Constraints: first/last name 1–50 characters; age optional 18–120; about up 
 
 Start the API from `tinder-server` after configuring its ignored `.env` from `.env.example`. Required values are `MONGODB_URI` and `JWT_SECRET`; `PORT` defaults to `3000`; `CLIENT_ORIGIN` defaults to `http://localhost:5173`.
 
+The API keeps `MONGODB_URI` and `JWT_SECRET` in its ignored server-side `.env`; the server loads that file at startup. The UI `.env` is for the public `VITE_API_URL` only. Never copy server credentials, JWT secrets, or passwords into the UI.
+
 Start the UI from `tinder-ui` with `npm run dev`. Vite defaults to `5173` and can choose the next open port if another process already owns it. If the old UI is still on `5173`, stop that Vite process and restart it from the current checkout. A fresh Vite process is needed to pick up `vite.config.js` changes.
 
 Useful UI checks:
